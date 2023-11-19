@@ -1,70 +1,83 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShoppingCart {
-    private static final ShoppingCart INSTANCE = new ShoppingCart();
-    private final Map<Product, Integer> items;
+    private final Map<Product, Integer> cartItems;
 
     private ShoppingCart() {
-        items = new HashMap<>();
+        cartItems = new HashMap<>();
+    }
+
+    private static class ShoppingCartHolder {
+        private static final ShoppingCart INSTANCE = new ShoppingCart();
     }
 
     public static ShoppingCart getInstance() {
-        return INSTANCE;
+        return ShoppingCartHolder.INSTANCE;
     }
 
     public void addProduct(Product product, int quantity) {
         if (product == null || quantity <= 0) {
-            System.out.println("Invalid product or quantity.");
             return;
         }
-        items.put(product, items.getOrDefault(product, 0) + quantity);
-        System.out.println("Added " + quantity + " unit(s) of " + product.getName() + " to the cart.");
+        cartItems.put(product, cartItems.getOrDefault(product, 0) + quantity);
     }
 
     public void removeProduct(Product product) {
-        if (product == null || !items.containsKey(product)) {
-            System.out.println("Product not found in the cart.");
-            return;
+        if (product != null) {
+            cartItems.remove(product);
         }
-        items.remove(product);
-        System.out.println("Removed " + product.getName() + " from the cart.");
-    }
-
-    public void updateProductQuantity(Product product, int quantity) {
-        if (product == null || !items.containsKey(product) || quantity <= 0) {
-            System.out.println("Invalid product or quantity.");
-            return;
-        }
-        items.put(product, quantity);
-        System.out.println("Updated quantity of " + product.getName() + " to " + quantity + " in the cart.");
-    }
-
-    public Map<Product, Integer> getItems() {
-        return new HashMap<>(items);
-    }
-
-    public void viewCart() {
-        if (items.isEmpty()) {
-            System.out.println("The shopping cart is empty.");
-            return;
-        }
-        items.forEach((product, quantity) ->
-                System.out.println("Product: " + product + ", Quantity: " + quantity));
-    }
-
-    public double calculateTotalCost() {
-        return items.entrySet().stream()
-                    .mapToDouble(entry -> entry.getKey().getPrice() * entry.getValue())
-                    .sum();
     }
 
     public boolean isEmpty() {
-        return items.isEmpty();
+        return cartItems.isEmpty();
+    }
+
+    public List<Product> getItems() {
+        return new ArrayList<>(cartItems.keySet());
+    }
+
+    public List<Integer> getQuantities() {
+        return new ArrayList<>(cartItems.values());
+    }
+
+    public Map<Product, Integer> getItemsWithQuantities() {
+        return new HashMap<>(cartItems);
+    }
+
+    public double calculateTotalCost() {
+        double totalCost = 0.0;
+        for (Map.Entry<Product, Integer> entry : cartItems.entrySet()) {
+            Product product = entry.getKey();
+            int quantity = entry.getValue();
+            totalCost += product.getPrice() * quantity;
+        }
+        return totalCost;
     }
 
     public void clearCart() {
-        items.clear();
-        System.out.println("The shopping cart has been cleared.");
+        cartItems.clear();
+    }
+
+    public void viewCart() {
+        if (cartItems.isEmpty()) {
+            System.out.println("Your cart is empty.");
+            return;
+        }
+        System.out.println("Shopping Cart Contents:");
+        for (Map.Entry<Product, Integer> entry : cartItems.entrySet()) {
+            Product product = entry.getKey();
+            int quantity = entry.getValue();
+            System.out.println(product.getName() + " - Quantity: " + quantity);
+        }
+    }
+
+    public void updateProductQuantity(Product product, int quantity) {
+        if (product == null || quantity <= 0) {
+            return;
+        }
+        cartItems.put(product, quantity);
     }
 }

@@ -1,5 +1,6 @@
-import java.util.HashMap; // Import statement for HashMap
+import java.util.HashMap;
 import java.util.Map;
+
 public class OrderProcessing {
     private static int nextOrderId = 1;
     private final PaymentProcessing paymentProcessor;
@@ -33,7 +34,7 @@ public class OrderProcessing {
     }
 
     private Order createOrder(int orderId, ShoppingCart cart, double totalCost) {
-        return new Order(orderId, new HashMap<>(cart.getItems()), totalCost);
+        return new Order(orderId, cart.getItemsWithQuantities(), totalCost);
     }
 
     private void completeOrderProcessing(Order order) {
